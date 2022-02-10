@@ -203,27 +203,6 @@ def route(steps=5):
     return
 
 
-def self_driving():  # self driving until reach target
-    set_target()
-    while curr_status == 0:
-        update_map()
-        route()
-        if cv2.waitKey(1) == 27:  # press esc
-            break
-    plot()
-    return
-
-
-def main():
-    cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
-    cv_thread.start()
-
-    for i in range(2):
-        self_driving()
-        print(cv_thread.name+' is alive ', cv_thread.isAlive())
-    return
-
-
 def test():
     return
 
