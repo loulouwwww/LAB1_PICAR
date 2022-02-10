@@ -4,7 +4,6 @@ import threading
 import time
 from unittest import case
 
-import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -37,15 +36,6 @@ movement_list = []
 # map mark: 0:blank 1:real obs 2:fake obs 3:car center 4:car, 5:target
 # assume car w: 3 grids,l: 5 grids
 cv_detected = 0
-
-
-def polar_mapping(step=18):
-    global polar_map
-    polar_map = []
-    for angle in range(-90, 91, step):
-        fc.get_distance_at(angle)
-        polar_map.append(fc.angle_distance)
-    return
 
 
 def polar_to_cartesian():
@@ -240,7 +230,7 @@ def test():
 
 def main():
     step_angle = 18
-    global cart_map, global_map, curr_dir
+    global polar_map, cart_map, global_map, curr_dir
     np.set_printoptions(threshold=10000, linewidth=1000)
 
     polar_map = [[i, 65-0.1*i]
