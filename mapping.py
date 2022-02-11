@@ -257,7 +257,12 @@ def detect():
         if counter % fps_avg_frame_count == 0:
             end_time = time.time()
             fps = fps_avg_frame_count / (end_time - start_time)
+            
+        #print fps when detecting
+            print('Fps now is: ', fps)
             start_time = time.time()
+
+        
 
         # Show the FPS
         fps_text = 'FPS = {:.1f}'.format(fps)
