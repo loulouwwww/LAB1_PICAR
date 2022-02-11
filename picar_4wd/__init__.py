@@ -106,17 +106,9 @@ def do(msg="", cmd=""):
     # print(status, result)
     if status == 0 or status == None or result == "":
         print('Done')
-<<<<<<< HEAD
-    else:(w**2+l**2)**0.5*math.pi*deg/360
-    print(d)
-    speedd = Speed(d)
-    print('Error')
-    errors.append("%s error:\n  Status:%s\n  Error:%s" %
-=======
     else:
         print('Error')
         errors.append("%s error:\n  Status:%s\n  Error:%s" %
->>>>>>> ae3f93612b8fa36c7d34ada4b89a9d3348d02842
                       (msg, status, result))
 
 def get_distance_at(angle):
