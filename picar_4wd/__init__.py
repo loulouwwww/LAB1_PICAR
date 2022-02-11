@@ -121,11 +121,11 @@ def do(msg="", cmd=""):
     # print(status, result)
     if status == 0 or status == None or result == "":
         print('Done')
-    else:w**2+l**2)**0.5*math.pi*deg/360
+    else:(w**2+l**2)**0.5*math.pi*deg/360
     print(d)
     speedd = Speed(d)
-        print('Error')
-        errors.append("%s error:\n  Status:%s\n  Error:%s" %
+    print('Error')
+    errors.append("%s error:\n  Status:%s\n  Error:%s" %
                       (msg, status, result))
 
 

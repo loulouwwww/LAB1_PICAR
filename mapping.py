@@ -16,8 +16,8 @@ size = 30  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
-half_lg = int(car_length/unit / 2)
-half_wg = int(car_width/unit/2)
+half_lg = int(car_length/unit / 2)  # 2
+half_wg = int(car_width/unit/2)  # 1
 half_size = int(size/2)
 real_obs = []  # [y,x]
 fake_obs = []
@@ -257,7 +257,12 @@ def detect():
         if counter % fps_avg_frame_count == 0:
             end_time = time.time()
             fps = fps_avg_frame_count / (end_time - start_time)
+            
+        #print fps when detecting
+            print('Fps now is: ', fps)
             start_time = time.time()
+
+        
 
         # Show the FPS
         fps_text = 'FPS = {:.1f}'.format(fps)
@@ -276,9 +281,8 @@ def detect():
 
 
 def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
-    global curr_status
+    global curr_status, global_map, target_y, target_x
     curr_status = 0
-    global global_map, target_y, target_x
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x
     target_x, target_y = bound(x, y)
@@ -288,7 +292,7 @@ def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
 
 def route(steps=5):
     for i in range(steps):
-        if curr_status == 0:
+        if curr_status == 0 and cv_detected == 0:
             opreation = 0  # should be a* function
             movement = (opreation-curr_dir) % 4
             movement_list.append(movement)
@@ -308,9 +312,9 @@ def self_driving():  # self driving until reach target
     while curr_status == 0:
         update_map()
         route()
-        if cv2.waitKey(1) == 27:
+        if cv2.waitKey(1) == 27:  # press esc
             break
-
+    plot()
     return
 
 
@@ -326,6 +330,7 @@ def main():
 
 def test():
     return
+
 
 # def main():
 #     step_angle = 18
