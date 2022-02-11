@@ -1,3 +1,4 @@
+import heapq
 import math
 import sys
 import threading
@@ -22,6 +23,12 @@ polar_map = []
 cart_map = np.zeros((size, size+1), dtype=int)  # local map
 global_map = np.zeros((size*multiple+1, size*multiple+1),
                       dtype=int)  # local map
+# init_y = 7
+# init_x = 85
+# curr_y = 7
+# curr_x = 85
+# target_y = 90
+# target_x = 40
 init_y = int(size*multiple/4)
 init_x = int(size*multiple/2)
 curr_y = int(size*multiple/4)
@@ -186,25 +193,97 @@ def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
     return
 
 
-def route(steps=5):
-    for i in range(steps):
-        if curr_status == 0 and cv_detected == 0:
-            opreation = 0  # should be a* function
-            movement = (opreation-curr_dir) % 4
-            movement_list.append(movement)
-            if movement == 0:
-                move_forward()
-            elif movement == 1:
-                move_left()
-            elif movement == 2:
-                move_backward()
-            elif movement == 3:
-                move_right()
-    return
+def route(dest, start, steps=5):
+    path = astar_single(dest, start, steps)
+    for operation in path:
+        movement = (operation-curr_dir) % 4
+        movement_list.append(movement)
+        if movement == 0:
+            move_forward()
+        elif movement == 1:
+            move_left()
+        elif movement == 2:
+            move_backward()
+        elif movement == 3:
+            move_right()
 
 
 def test():
     return
+
+
+class Node(object):
+    def __init__(self, prev, loc, direction):
+        self.prev = prev
+        self.loc = loc
+        self.direction = direction
+
+    def __lt__(self, other):
+        return self.loc < other.loc
+
+
+def manhattan_distance(a, b):
+    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+
+
+def neighbors(i, j):
+    global global_map
+    return tuple(x for x in (
+        (i + 1, j),
+        (i - 1, j),
+        (i, j + 1),
+        (i, j - 1))
+        if global_map[x[0]][x[1]] not in [1, 2])
+
+
+def astar_single(dest, start, limit):
+    node = Node(None, start, -1)
+    frontier = [(manhattan_distance(start, dest), node)]
+    closed = {}
+    res = []
+    step = 0
+
+    while frontier:
+        step += 1
+        elem = heapq.heappop(frontier)
+
+        fx = elem[0]
+        node = elem[1]
+
+        curr = node.loc
+        closed[curr] = fx
+
+        return_direction = node.direction
+
+        from_start = fx - manhattan_distance(curr, dest)
+
+        x = curr[0]
+        y = curr[1]
+
+        if step >= limit or (x, y) == dest:
+            while node:
+                res.insert(0, node.direction)
+                node = node.prev
+            break
+
+        for neighbor in neighbors(x, y):
+            new_fx = manhattan_distance(neighbor, dest) + from_start + 1
+
+            if neighbor not in closed or new_fx < closed[neighbor]:
+                x_0, y_0 = neighbor
+
+                direction = 0  # move down by default
+
+                if x_0 == x + 1:
+                    direction = 1  # move right
+                if y_0 == y - 1:
+                    direction = 2  # move up
+                if x_0 == x - 1:
+                    direction = 3  # move left
+
+                heapq.heappush(frontier, (new_fx, Node(node, neighbor, direction)))
+
+    return res
 
 
 def main():
@@ -215,31 +294,36 @@ def main():
     polar_map = [[i, 65-0.1*i]
                  for i in range(-3*step_angle, 3*step_angle+1, step_angle)]
     update_map()
-    move_left()
-    for i in range(20):
-        move_forward()
+    # move_left()
+    # for i in range(20):
+    #     move_forward()
     polar_map = [[i, 50-0.1*i]
                  for i in range(-1*step_angle, 5*step_angle+1, step_angle)]
     update_map()
-    move_right()
-    for i in range(20):
-        move_forward()
+    # move_right()
+    # for i in range(20):
+    #     move_forward()
     polar_map = [[i, 35-0.1*i]
                  for i in range(-2*step_angle, 5*step_angle+1, step_angle)]
     update_map()
-    move_right()
-    for i in range(20):
-        move_forward()
+    # move_right()
+    # for i in range(20):
+    #     move_forward()
     polar_map = [[i, 30-0.1*i]
                  for i in range(-5*step_angle, 5*step_angle+1, step_angle)]
     update_map()
-    for i in range(10):
-        move_backward()
+    # for i in range(10):
+    #     move_backward()
     polar_map = [[i, 30]
                  for i in range(-5*step_angle, 5*step_angle+1, step_angle)]
-    move_left()
-    for i in range(20):
-        move_forward()
+    # move_left()
+    # for i in range(20):
+    #     move_forward()
+    update_map()
+
+    while (curr_x, curr_y) != (target_x, target_y):
+        route((target_x, target_y), (curr_x, curr_y))
+
     update_map()
     plot()
     return

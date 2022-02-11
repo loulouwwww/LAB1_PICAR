@@ -24,10 +24,11 @@ def neighbors(maze, i, j):
         if maze[x[0]][x[1]] != 1)
 
 
-def astar_single_one_step(maze, dest, start):
+def astar_single_one_step(maze, dest, start, limit):
     node = Node(None, start, -1)
     frontier = [(manhattan_distance(start, dest), node)]
     closed = {}
+    res = []
 
     while frontier:
         elem = heapq.heappop(frontier)
@@ -44,6 +45,12 @@ def astar_single_one_step(maze, dest, start):
 
         x = curr[0]
         y = curr[1]
+
+        if len(res) >= limit or (x, y) == dest:
+            while node:
+                res.insert(0, node.direction)
+                node = node.prev
+            break
 
         neighbors = neighbors(maze, x, y)
         for neighbor in neighbors:
@@ -63,4 +70,4 @@ def astar_single_one_step(maze, dest, start):
 
                 heapq.heappush(frontier, (new_fx, Node(node, neighbor, direction)))
 
-    return return_direction
+    return res
