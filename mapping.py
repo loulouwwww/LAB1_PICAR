@@ -1,16 +1,17 @@
-from unittest import case
-import picar_4wd as fc
-import numpy as np
 import math
-import matplotlib.pyplot as plt
-import helper_functions as hf
-import time
 import sys
-import cv2
-from object_detector import ObjectDetector
-from object_detector import ObjectDetectorOptions
-import utils
 import threading
+import time
+from unittest import case
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+import helper_functions as hf
+import picar_4wd as fc
+import utils
+from object_detector import ObjectDetector, ObjectDetectorOptions
 
 size = 30  # size of local map
 unit = 5  # cm/grid
@@ -290,21 +291,105 @@ def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
     return
 
 
-def route(steps=5):
-    for i in range(steps):
-        if curr_status == 0 and cv_detected == 0:
-            opreation = 0  # should be a* function
-            movement = (opreation-curr_dir) % 4
-            movement_list.append(movement)
-            if movement == 0:
-                move_forward()
-            elif movement == 1:
-                move_left()
-            elif movement == 2:
-                move_backward()
-            elif movement == 3:
-                move_right()
-    return
+def route(dest, start, steps=5):
+    path = astar_single(dest, start, steps)
+    for operation in path:
+        if operation == -1:
+            continue
+        movement = (operation-curr_dir) % 4
+        movement_list.append(movement)
+        if movement == 0:
+            move_forward()
+        elif movement == 1:
+            move_left()
+        elif movement == 2:
+            move_backward()
+        elif movement == 3:
+            move_right()
+
+
+class Node(object):
+    def __init__(self, prev, loc, direction):
+        self.prev = prev
+        self.loc = loc
+        self.direction = direction
+
+    def __lt__(self, other):
+        return self.loc < other.loc
+
+
+def manhattan_distance(a, b):
+    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+
+
+def neighbors(i, j):
+    n = len(global_map)
+    m = len(global_map[0])
+    res = []
+    if i + 1 < n and global_map[i+1][j] not in [1, 2]:
+        res.append((i+1, j))
+    if i - 1 >= 0 and global_map[i-1][j] not in [1, 2]:
+        res.append((i-1, j))
+    if j + 1 < m and global_map[i][j+1] not in [1, 2]:
+        res.append((i, j+1))
+    if j - 1 >= 0 and global_map[i][j-1] not in [1, 2]:
+        res.append((i, j-1))
+
+    for coord in res:
+        ii, jj = coord
+        print(coord)
+        print(global_map[ii][jj])
+    return res
+
+
+def astar_single(dest, start, limit):
+    node = Node(None, start, -1)
+    frontier = [(manhattan_distance(start, dest), node)]
+    closed = {}
+    res = []
+    step = 0
+
+    while frontier:
+        step += 1
+        elem = heapq.heappop(frontier)
+
+        fx = elem[0]
+        node = elem[1]
+
+        curr = node.loc
+        closed[curr] = fx
+
+        return_direction = node.direction
+
+        from_start = fx - manhattan_distance(curr, dest)
+
+        i = curr[0]
+        j = curr[1]
+
+        if step >= limit or (i, j) == dest:
+            while node:
+                res.insert(0, node.direction)
+                node = node.prev
+            break
+
+        for neighbor in neighbors(i, j):
+            new_fx = manhattan_distance(neighbor, dest) + from_start + 1
+
+            if neighbor not in closed or new_fx < closed[neighbor]:
+                ii, jj = neighbor
+
+                direction = 0  # move down by default
+
+                if jj == j + 1:
+                    direction = 1  # move right
+                if ii == i - 1:
+                    direction = 2  # move up
+                if jj == j - 1:
+                    direction = 3  # move left
+
+                heapq.heappush(frontier, (new_fx, Node(node, neighbor, direction)))
+
+    return res
 
 
 def self_driving():  # self driving until reach target

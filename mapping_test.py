@@ -193,6 +193,10 @@ def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
     return
 
 
+def test():
+    return
+
+
 def route(dest, start, steps=5):
     path = astar_single(dest, start, steps)
     for operation in path:
@@ -208,10 +212,6 @@ def route(dest, start, steps=5):
             move_backward()
         elif movement == 3:
             move_right()
-
-
-def test():
-    return
 
 
 class Node(object):
