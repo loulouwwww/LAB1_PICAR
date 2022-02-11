@@ -33,8 +33,8 @@ init_y = int(size*multiple/4)
 init_x = int(size*multiple/2)
 curr_y = int(size*multiple/4)
 curr_x = int(size*multiple/2)
-target_y = 0
-target_x = 0
+target_y = 40
+target_x = 40
 # Direction:0:screen down(0), 1:screen right(left90), 2:screen up(180), 3:screen left(right 90)
 curr_dir = 0
 curr_status = 0
@@ -116,7 +116,7 @@ def mark_obs():
 
 
 def update_map():
-    # global cart_map, real_obs, global_map, fake_obs
+    global cart_map, real_obs, global_map, fake_obs
     polar_to_cartesian()
     mark_obs()
     mark_car()
@@ -196,6 +196,8 @@ def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
 def route(dest, start, steps=5):
     path = astar_single(dest, start, steps)
     for operation in path:
+        if operation == -1:
+            continue
         movement = (operation-curr_dir) % 4
         movement_list.append(movement)
         if movement == 0:
@@ -227,13 +229,23 @@ def manhattan_distance(a, b):
 
 
 def neighbors(i, j):
-    global global_map
-    return tuple(x for x in (
-        (i + 1, j),
-        (i - 1, j),
-        (i, j + 1),
-        (i, j - 1))
-        if global_map[x[0]][x[1]] not in [1, 2])
+    n = len(global_map)
+    m = len(global_map[0])
+    res = []
+    if i + 1 < n and global_map[i+1][j] not in [1, 2]:
+        res.append((i+1, j))
+    if i - 1 >= 0 and global_map[i-1][j] not in [1, 2]:
+        res.append((i-1, j))
+    if j + 1 < m and global_map[i][j+1] not in [1, 2]:
+        res.append((i, j+1))
+    if j - 1 >= 0 and global_map[i][j-1] not in [1, 2]:
+        res.append((i, j-1))
+
+    for coord in res:
+        ii, jj = coord
+        print(coord)
+        print(global_map[ii][jj])
+    return res
 
 
 def astar_single(dest, start, limit):
@@ -257,28 +269,28 @@ def astar_single(dest, start, limit):
 
         from_start = fx - manhattan_distance(curr, dest)
 
-        x = curr[0]
-        y = curr[1]
+        i = curr[0]
+        j = curr[1]
 
-        if step >= limit or (x, y) == dest:
+        if step >= limit or (i, j) == dest:
             while node:
                 res.insert(0, node.direction)
                 node = node.prev
             break
 
-        for neighbor in neighbors(x, y):
+        for neighbor in neighbors(i, j):
             new_fx = manhattan_distance(neighbor, dest) + from_start + 1
 
             if neighbor not in closed or new_fx < closed[neighbor]:
-                x_0, y_0 = neighbor
+                ii, jj = neighbor
 
                 direction = 0  # move down by default
 
-                if x_0 == x + 1:
+                if jj == j + 1:
                     direction = 1  # move right
-                if y_0 == y - 1:
+                if ii == i - 1:
                     direction = 2  # move up
-                if x_0 == x - 1:
+                if jj == j - 1:
                     direction = 3  # move left
 
                 heapq.heappush(frontier, (new_fx, Node(node, neighbor, direction)))
@@ -321,8 +333,10 @@ def main():
     #     move_forward()
     update_map()
 
-    while (curr_x, curr_y) != (target_x, target_y):
-        route((target_x, target_y), (curr_x, curr_y))
+    count = 0
+    while (curr_y, curr_x) != (target_y, target_x) and count < 10000:
+        route((target_y, target_x), (curr_y, curr_x))
+        count += 1
 
     update_map()
     plot()
