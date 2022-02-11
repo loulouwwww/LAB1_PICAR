@@ -20,34 +20,34 @@ def turn_left_deg():
     speedd = Speed(30)
     speedd.start()
     fc.turn_left(100)
-    for i in range(11):
+    for i in range(10):
         time.sleep(0.05)
     speedd.deinit()
     fc.stop()
 
-# 50mm*1grid
+# 50mm*2grid
 
-
-def forward_grid():
+# n means grid
+def forward_grid(n=1):
     speed4 = Speed(30)
     speed4.start()
     fc.forward(100)
-    for i in range(1):
+    for i in range(n):
         time.sleep(0.1)
     speed4.deinit()
     fc.stop()
 
 
-def backward_grid():
+def backward_grid(n=1):
     speed4 = Speed(30)
     speed4.start()
     fc.backward(100)
-    for i in range(1):
+    for i in range(n):
         time.sleep(0.1)
     speed4.deinit()
     fc.stop()
 
 if __name__ == "__main__":
-    turn_right_deg()
+    #forward_grid(2)
+    backward_grid(2)
     fc.stop()
-
