@@ -38,7 +38,7 @@ target_x = 0
 # Direction:0:screen down(0), 1:screen right(left90), 2:screen up(180), 3:screen left(right 90)
 curr_dir = 0
 curr_status = 0
-stutas_list = []  # 0:routing 1:reach
+# 0:routing 1:reach
 movement_list = []
 # map mark: 0:blank 1:real obs 2:fake obs 3:car center 4:car, 5:target
 # assume car w: 3 grids,l: 5 grids
@@ -81,9 +81,9 @@ def mark_car():
     curr_x, curr_y = bound(curr_x, curr_y)
     if global_map[curr_y][curr_x] == 5:
         curr_status = 1
+        return
     else:
         curr_status = 0
-    stutas_list.append(curr_status)
     global_map[curr_y][curr_x] = 3
     for i in range(-half_wg, half_wg+1):
         for j in range(-half_lg, half_lg+1):
@@ -130,6 +130,7 @@ def update_map():
     polar_to_cartesian()
     mark_obs()
     mark_car()
+    print(curr_status)
     return
 
 
@@ -393,14 +394,15 @@ def astar_single(dest, start, limit):
 
 
 def self_driving():  # self driving until reach target
+    global curr_status
     set_target()
     while curr_status == 0:
         update_map()
-        plot()
         route((target_y, target_x), (curr_y, curr_x))
-        if cv2.waitKey(1) == 27:  # press esc
-            break
-
+        # if cv2.waitKey(1) == 27:  # press esc
+        #     break
+    print('1')
+    plot()
     return
 
 
