@@ -410,6 +410,7 @@ def main():
     for i in range(1):
         # self_driving()
         update_map()
+        plot()
         # print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
