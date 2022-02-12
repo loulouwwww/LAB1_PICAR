@@ -50,7 +50,6 @@ def polar_mapping(step=18):
     polar_map = []
     for angle in range(-90, 91, step):
         angdis = [angle, fc.get_distance_at(angle)]
-        print(angdis)
         polar_map.append(angdis)
     return
 
@@ -65,7 +64,6 @@ def polar_to_cartesian():
             y = int(i[1]*math.cos(i[0]/180*math.pi)/unit)
             real_obs.append([y, x])
             cart_map[y][x] = 1
-            print('obs:', y, x)
 
     return
 
@@ -81,7 +79,7 @@ def bound(base_x, base_y):
 def mark_car():
     global cart_map, real_obs, global_map, fake_obs, curr_x, curr_y, curr_status
     curr_x, curr_y = bound(curr_x, curr_y)
-    print(str(curr_y)+','+str(curr_x))
+    print(curr_y, curr_x)
     if global_map[curr_y][curr_x] == 5:
         curr_status = 1
         return
@@ -284,7 +282,7 @@ def detect():
     return
 
 
-def set_target(rel_y=40, rel_x=30):  # relative position(cm) to car
+def set_target(rel_y=40, rel_x=0):  # relative position(cm) to car
     global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
@@ -295,7 +293,7 @@ def set_target(rel_y=40, rel_x=30):  # relative position(cm) to car
     return
 
 
-def route(dest, start, steps=5):
+def route(dest, start, steps=3):
     path = astar_single(dest, start, steps)
     for operation in path:
         if operation == -1:
@@ -407,14 +405,14 @@ def self_driving():  # self driving until reach target
 
 
 def main():
-    # cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
-    # cv_thread.start()
+    cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
+    cv_thread.start()
 
     for i in range(1):
         self_driving()
         # update_map()
         # plot()
-        # print(cv_thread.name+' is alive ', cv_thread.isAlive())
+        print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
 
