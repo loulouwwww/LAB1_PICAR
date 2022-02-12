@@ -14,7 +14,7 @@ import picar_4wd as fc
 import utils
 from object_detector import ObjectDetector, ObjectDetectorOptions
 
-size = 20  # size of local map
+size = 9  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
@@ -284,7 +284,7 @@ def detect():
     return
 
 
-def set_target(rel_y=70, rel_x=0):  # relative position(cm) to car
+def set_target(rel_y=40, rel_x=0):  # relative position(cm) to car
     global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
