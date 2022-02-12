@@ -14,7 +14,7 @@ import picar_4wd as fc
 import utils
 from object_detector import ObjectDetector, ObjectDetectorOptions
 
-size = 9  # size of local map
+size = 16  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
@@ -23,7 +23,7 @@ half_wg = int(car_width/unit/2)  # 1
 half_size = int(size/2)
 real_obs = []  # [y,x]
 fake_obs = []
-multiple = 2
+multiple = 3
 
 polar_map = []
 cart_map = np.zeros((size, size+1), dtype=int)  # local map
@@ -284,7 +284,7 @@ def detect():
     return
 
 
-def set_target(rel_y=40, rel_x=40):  # relative position(cm) to car
+def set_target(rel_y=40, rel_x=30):  # relative position(cm) to car
     global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
