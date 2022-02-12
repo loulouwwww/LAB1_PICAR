@@ -396,10 +396,10 @@ def self_driving():  # self driving until reach target
     set_target()
     while curr_status == 0:
         update_map()
+        plot()
         route((target_y, target_x), (curr_y, curr_x))
         if cv2.waitKey(1) == 27:  # press esc
             break
-    plot()
 
     return
 
