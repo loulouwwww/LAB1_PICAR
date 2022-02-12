@@ -295,21 +295,20 @@ def set_target(rel_y=40, rel_x=0):  # relative position(cm) to car
 
 
 def route(dest, start, steps=3):
-    while cv_detected == 0:
-        path = astar_single(dest, start, steps)
-        for operation in path:
-            if operation == -1:
-                continue
-            movement = (operation-curr_dir) % 4
-            movement_list.append(movement)
-            if movement == 0:
-                move_forward()
-            elif movement == 1:
-                move_left()
-            elif movement == 2:
-                move_backward()
-            elif movement == 3:
-                move_right()
+    path = astar_single(dest, start, steps)
+    for operation in path:
+        if operation == -1:
+            continue
+        movement = (operation-curr_dir) % 4
+        movement_list.append(movement)
+        if movement == 0:
+            move_forward()
+        elif movement == 1:
+            move_left()
+        elif movement == 2:
+            move_backward()
+        elif movement == 3:
+            move_right()
 
 
 class Node(object):
@@ -396,7 +395,7 @@ def astar_single(dest, start, limit):
 def self_driving():  # self driving until reach target
     global curr_status
     set_target()
-    while (curr_x != target_x) or (curr_y != target_y):
+    while cv_detected == 0 and ((curr_x != target_x) or (curr_y != target_y)):
         update_map()
         route((target_y, target_x), (curr_y, curr_x))
         # if cv2.waitKey(1) == 27:  # press esc
