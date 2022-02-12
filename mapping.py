@@ -54,7 +54,7 @@ def polar_mapping(step=18):
     return
 
 
-def polar_to_cartesian(polar_map):
+def polar_to_cartesian():
     global cart_map, real_obs
     cart_map = np.zeros((size, size+1), dtype=int)
     real_obs = []
