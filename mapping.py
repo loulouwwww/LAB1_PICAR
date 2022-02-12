@@ -396,7 +396,7 @@ def astar_single(dest, start, limit):
 def self_driving():  # self driving until reach target
     global curr_status
     set_target()
-    while curr_status == 0:
+    while (curr_x != target_x) and (curr_y != target_y):
         update_map()
         route((target_y, target_x), (curr_y, curr_x))
         # if cv2.waitKey(1) == 27:  # press esc
