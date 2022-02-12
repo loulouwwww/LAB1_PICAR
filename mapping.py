@@ -77,7 +77,7 @@ def bound(base_x, base_y):
 
 
 def mark_car():
-    global cart_map, real_obs, global_map, fake_obs, curr_x, curr_y
+    global cart_map, real_obs, global_map, fake_obs, curr_x, curr_y, curr_status
     curr_x, curr_y = bound(curr_x, curr_y)
     if global_map[curr_y][curr_x] == 5:
         curr_status = 1
@@ -281,7 +281,7 @@ def detect():
 
 
 def set_target(rel_y=30, rel_x=30):  # relative position(cm) to car
-    global curr_status, global_map, target_y, target_x, curr_status
+    global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x
@@ -397,8 +397,8 @@ def self_driving():  # self driving until reach target
     while curr_status == 0:
         update_map()
         route((target_y, target_x), (curr_y, curr_x))
-        # if cv2.waitKey(1) == 27:  # press esc
-        #     break
+        if cv2.waitKey(1) == 27:  # press esc
+            break
     plot()
 
     return
@@ -411,6 +411,7 @@ def main():
     for i in range(1):
         self_driving()
         # print(cv_thread.name+' is alive ', cv_thread.isAlive())
+    fc.stop()
     return
 
 
