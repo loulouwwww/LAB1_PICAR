@@ -79,6 +79,7 @@ def bound(base_x, base_y):
 def mark_car():
     global cart_map, real_obs, global_map, fake_obs, curr_x, curr_y, curr_status
     curr_x, curr_y = bound(curr_x, curr_y)
+    print(curr_y+','+curr_x)
     if global_map[curr_y][curr_x] == 5:
         curr_status = 1
         return
@@ -281,13 +282,14 @@ def detect():
     return
 
 
-def set_target(rel_y=30, rel_x=30):  # relative position(cm) to car
+def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
     global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x
     target_x, target_y = bound(x, y)
-    global_map[y][x] = 5
+    global_map[target_y][target_x] = 5
+    print(target_y+','+target_x)
     return
 
 
