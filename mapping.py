@@ -50,6 +50,7 @@ def polar_mapping(step=18):
     polar_map = []
     for angle in range(-90, 91, step):
         fc.get_distance_at(angle)
+        print('ang,dis:', fc.angle_distance)
         polar_map.append(fc.angle_distance)
     return
 
@@ -64,6 +65,7 @@ def polar_to_cartesian():
             y = int(i[1]*math.cos(i[0]/180*math.pi)/unit)
             real_obs.append([y, x])
             cart_map[y][x] = 1
+            print('obs:', y, x)
 
     return
 
