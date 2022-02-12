@@ -408,7 +408,8 @@ def main():
     # cv_thread.start()
 
     for i in range(1):
-        self_driving()
+        # self_driving()
+        update_map()
         # print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
