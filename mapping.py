@@ -79,7 +79,7 @@ def bound(base_x, base_y):
 def mark_car():
     global cart_map, real_obs, global_map, fake_obs, curr_x, curr_y, curr_status
     curr_x, curr_y = bound(curr_x, curr_y)
-    print(curr_y+','+curr_x)
+    print(str(curr_y)+','+str(curr_x))
     if global_map[curr_y][curr_x] == 5:
         curr_status = 1
         return
@@ -131,7 +131,6 @@ def update_map():
     polar_to_cartesian()
     mark_obs()
     mark_car()
-    print(curr_status)
     return
 
 
@@ -289,7 +288,7 @@ def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
     x = int(rel_x/unit)+curr_x
     target_x, target_y = bound(x, y)
     global_map[target_y][target_x] = 5
-    print(target_y+','+target_x)
+    print(str(target_y)+','+str(target_x))
     return
 
 
@@ -337,10 +336,6 @@ def neighbors(i, j):
     if j - 1 >= 0 and global_map[i][j-1] not in [1, 2]:
         res.append((i, j-1))
 
-    # for coord in res:
-    #     ii, jj = coord
-    #     print(coord)
-    #     print(global_map[ii][jj])
     return res
 
 
