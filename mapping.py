@@ -35,7 +35,7 @@ init_y = int(size*multiple/4)
 init_x = int(size*multiple/2)
 curr_y = int(size*multiple/4)
 curr_x = int(size*multiple/2)
-target_y = 2*init_y
+target_y = 5*init_y
 target_x = init_x
 # Direction:0:screen down(0), 1:screen right(left90), 2:screen up(180), 3:screen left(right 90)
 curr_dir = 0
@@ -341,7 +341,7 @@ def detect():
     return
 
 
-def set_target(rel_y=80, rel_x=0):  # relative position(cm) to car
+def set_target(rel_y=160, rel_x=0):  # relative position(cm) to car
     global global_map, target_y, target_x
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x

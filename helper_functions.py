@@ -30,7 +30,7 @@ def turn_left_deg():
 def forward_grid(n=1):
     fc.forward(100)
     for i in range(n):
-        time.sleep(0.1)
+        time.sleep(0.122)
     fc.stop()
     time.sleep(0.1)
 
@@ -38,12 +38,13 @@ def forward_grid(n=1):
 def backward_grid(n=1):
     fc.backward(100)
     for i in range(n):
-        time.sleep(0.1)
+        time.sleep(0.122)
     fc.stop()
     time.sleep(0.1)
 
 
 if __name__ == "__main__":
     # forward_grid(2)
-    backward_grid(2)
+
+    forward_grid(5)
     fc.stop()
