@@ -88,17 +88,17 @@ def mark_car():
     else:
         curr_status = 0
     global_map[curr_y][curr_x] = 3
-    for i in range(-half_wg, half_wg+1):
-        for j in range(-half_lg, half_lg+1):
-            if curr_dir % 2 == 0:
-                y = curr_y+j
-                x = curr_x+i
-            else:
-                y = curr_y+i
-                x = curr_x+j
-            x, y = bound(x, y)
-            if global_map[y][x] != 3:
-                global_map[y][x] = 4
+    # for i in range(-half_wg, half_wg+1):
+    #     for j in range(-half_lg, half_lg+1):
+    #         if curr_dir % 2 == 0:
+    #             y = curr_y+j
+    #             x = curr_x+i
+    #         else:
+    #             y = curr_y+i
+    #             x = curr_x+j
+    #         x, y = bound(x, y)
+    #         if global_map[y][x] != 3:
+    #             global_map[y][x] = 4
     return
 
 
