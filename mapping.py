@@ -249,9 +249,9 @@ def detect():
         # detection:bounding_box(left,top,right,bottom),categories(list[Category()label,score,index])
         s_p_detect = 0  # checkpoint
         for d in detections:
-            if d.categories[0].label == 12:  # stop sign
+            if d.categories[0].label == "stop sign":  # stop sign
                 s_p_detect = 1
-            elif d.categories[0].label == 0:  # person
+            elif d.categories[0].label == "person":  # person
                 s_p_detect = 2
         cv_detected = s_p_detect
         print(s_p_detect)
