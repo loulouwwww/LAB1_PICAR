@@ -133,6 +133,7 @@ def update_map():
     polar_to_cartesian()
     mark_obs()
     mark_car()
+    plot()
     return
 
 
