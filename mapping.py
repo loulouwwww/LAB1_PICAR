@@ -21,23 +21,24 @@ car_length = 23.5
 half_lg = int(car_length/unit / 2)  # 2
 half_wg = int(car_width/unit/2)  # 1
 half_size = int(size/2)
-real_obs = []  # [y,x]
-fake_obs = []
+real_local_obs = []  # [y,x]
+real_global_obs = []
 multiple = 3
 
 polar_map = []
-cart_map = np.zeros((size, size+1), dtype=int)  # local map
-global_map = np.zeros((size*multiple+1, size*multiple+1),
+cart_map = np.zeros((size+1, size+1), dtype=int)  # local map
+total_size = size*multiple+1
+global_map = np.zeros((total_size, total_size),
                       dtype=int)  # local map
+
 init_y = int(size*multiple/4)
 init_x = int(size*multiple/2)
 curr_y = int(size*multiple/4)
 curr_x = int(size*multiple/2)
-target_y = 0
-target_x = 0
+target_y = 2*init_y
+target_x = init_x
 # Direction:0:screen down(0), 1:screen right(left90), 2:screen up(180), 3:screen left(right 90)
 curr_dir = 0
-curr_status = 0
 # 0:routing 1:reach
 movement_list = []
 # map mark: 0:blank 1:real obs 2:fake obs 3:car center 4:car, 5:target
@@ -55,14 +56,14 @@ def polar_mapping(step=18):
 
 
 def polar_to_cartesian():
-    global cart_map, real_obs
+    global cart_map, real_local_obs
     cart_map = np.zeros((size, size+1), dtype=int)
-    real_obs = []
+    real_local_obs = []
     for i in polar_map:
         if i[1] >= 0 and i[1] < size*unit/2:
             x = int(i[1]*math.sin(i[0]/180*math.pi)/unit)+half_size
             y = int(i[1]*math.cos(i[0]/180*math.pi)/unit)
-            real_obs.append([y, x])
+            real_local_obs.append([y, x])
             cart_map[y][x] = 1
 
     return
@@ -81,11 +82,9 @@ def mark_car():
     curr_x, curr_y = bound(curr_x, curr_y)
     print(curr_y, curr_x)
     if global_map[curr_y][curr_x] == 5:
-        curr_status = 1
         return
     else:
-        curr_status = 0
-    global_map[curr_y][curr_x] = 3
+        global_map[curr_y][curr_x] = 3
     # for i in range(-half_wg, half_wg+1):
     #     for j in range(-half_lg, half_lg+1):
     #         if curr_dir % 2 == 0:
@@ -99,27 +98,86 @@ def mark_car():
     #             global_map[y][x] = 4
     return
 
+# transform the local coord to global coord
+
+
+def local_to_global(local_y, local_x):
+    global_y = 0
+    global_x = 0
+    if curr_dir == 0:
+        global_y = curr_y+local_y + (half_lg+1)
+        global_x = curr_x+local_x-half_size
+    elif curr_dir == 1:
+        global_y = curr_y-local_x+half_size
+        global_x = curr_x+local_y+(half_lg+1)
+    elif curr_dir == 2:
+        global_y = curr_y-local_y - (half_lg+1)
+        global_x = curr_x-local_x+half_size
+    elif curr_dir == 3:
+        global_y = curr_y+local_x - half_size
+        global_x = curr_x-local_y-(half_lg+1)
+    global_x, global_y = bound(global_x, global_y)
+    return global_y, global_x
+# transform the global coord to local coord
+
+
+def global_to_local(global_y, global_x):
+    local_y = 0
+    local_x = 0
+    if curr_dir == 0:
+        local_y = global_y-curr_y-(half_lg+1)
+        local_x = global_x-curr_x+half_size
+    elif curr_dir == 1:
+        local_x = curr_y-global_y+half_size
+        local_y = global_x-curr_x-(half_lg+1)
+    elif curr_dir == 2:
+        local_y = curr_y-global_y - (half_lg+1)
+        local_x = curr_x-global_x+half_size
+    elif curr_dir == 3:
+        local_x = global_y-curr_y+half_size
+        local_y = curr_x-global_x-(half_lg+1)
+
+    return local_y, local_x
+
 
 def mark_obs():
+    global global_map, real_global_obs
     r2 = half_lg**2
-    for obs in real_obs:
-        if curr_dir == 0:
-            base_y = curr_y+obs[0] + (half_lg+1)
-            base_x = curr_x+obs[1]-half_size
-        elif curr_dir == 1:
-            base_y = curr_y-obs[1]+half_size
-            base_x = curr_x+obs[0]+(half_lg+1)
-        elif curr_dir == 2:
-            base_y = curr_y-obs[0] - (half_lg+1)
-            base_x = curr_x-obs[1]+half_size
-        else:
-            base_y = curr_y+obs[1] - half_size
-            base_x = curr_x-obs[0]-(half_lg+1)
-        base_x, base_y = bound(base_x, base_y)
+    # print(real_global_obs)
+    remove_list = []
+    for obs in real_global_obs:
+        ly, lx = global_to_local(obs[0], obs[1])
+        # print(ly, lx)
+        # print(obs[0], obs[1])
+        if ly >= -1 and ly <= size and lx >= -half_size-1 and lx <= half_size+1:
+            remove_list.append(obs)
+            global_map[obs[0], obs[1]] = 0
+        # remove 2 ways
+        # for i in range(-half_lg, half_lg+1):
+        #     for j in range(-half_lg, half_lg + 1):
+        #         if global_map[obs[0]+i][obs[1]+j] == 2:
+        #             global_map[obs[0]+i][obs[1]+j] = 0
+            for i in range(-half_lg, half_lg+1):
+                for j in range(-half_lg, half_lg + 1):
+                    # no bound check
+                    if i**2+j**2 <= r2 and global_map[obs[0]+i][obs[1]+j] == 2:
+                        global_map[obs[0]+i][obs[1]+j] = 0
+    for obs in remove_list:
+        real_global_obs.remove(obs)
+    # print('add')
+    for obs in real_local_obs:
+        base_y, base_x = local_to_global(obs[0], obs[1])
         global_map[base_y][base_x] = 1
-        # padding
+        # print(base_y, base_x)
+        real_global_obs.append([base_y, base_x])
+        # padding 2 ways
+        # for i in range(-half_lg, half_lg+1):
+        #     for j in range(-half_lg, half_lg + 1):
+        #         if global_map[base_y+i][base_x+j] == 0:
+        #             global_map[base_y+i][base_x+j] = 2
         for i in range(-half_lg, half_lg+1):
             for j in range(-half_lg, half_lg + 1):
+                # no bound check
                 if i**2+j**2 <= r2 and global_map[base_y+i][base_x+j] == 0:
                     global_map[base_y+i][base_x+j] = 2
     return
@@ -284,23 +342,23 @@ def detect():
 
 
 def set_target(rel_y=80, rel_x=0):  # relative position(cm) to car
-    global curr_status, global_map, target_y, target_x
-    curr_status = 0
+    global global_map, target_y, target_x
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x
     target_x, target_y = bound(x, y)
     global_map[target_y][target_x] = 5
-    print(str(target_y)+','+str(target_x))
+    print('target', target_y, target_x)
     return
 
 
-def route(dest, start, steps=3):
-    path = astar_single(dest, start, steps)
+def route(dest, start, steps=10):
+    path = astar_single(dest, start)
+    mlen = min(len(path), steps)
+    path = path[:mlen]
     for operation in path:
         if operation == -1:
             continue
         movement = (operation-curr_dir) % 4
-        movement_list.append(movement)
         if movement == 0:
             move_forward()
         elif movement == 1:
@@ -341,7 +399,7 @@ def neighbors(i, j):
     return res
 
 
-def astar_single(dest, start, limit):
+def astar_single(dest, start, limit=5000):
     node = Node(None, start, -1)
     frontier = [(manhattan_distance(start, dest), node)]
     closed = {}
@@ -358,16 +416,14 @@ def astar_single(dest, start, limit):
         curr = node.loc
         closed[curr] = fx
 
-        return_direction = node.direction
-
         from_start = fx - manhattan_distance(curr, dest)
 
         i = curr[0]
         j = curr[1]
-
+        print(fx, i, j)
         if step >= limit or (i, j) == dest:
             while node:
-                res.insert(0, node.direction)
+                res.append(node.direction)
                 node = node.prev
             break
 
@@ -388,12 +444,11 @@ def astar_single(dest, start, limit):
 
                 heapq.heappush(
                     frontier, (new_fx, Node(node, neighbor, direction)))
-
+    res.reverse()
     return res
 
 
 def self_driving():  # self driving until reach target
-    global curr_status
     set_target()
     while cv_detected == 0 and ((curr_x != target_x) or (curr_y != target_y)):
         update_map()
