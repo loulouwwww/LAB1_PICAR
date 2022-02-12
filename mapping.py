@@ -14,7 +14,7 @@ import picar_4wd as fc
 import utils
 from object_detector import ObjectDetector, ObjectDetectorOptions
 
-size = 24  # size of local map
+size = 20  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
@@ -406,14 +406,14 @@ def self_driving():  # self driving until reach target
 
 
 def main():
-    cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
-    cv_thread.start()
+    # cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
+    # cv_thread.start()
 
     for i in range(1):
         self_driving()
         # update_map()
-        # plot()
-        print(cv_thread.name+' is alive ', cv_thread.isAlive())
+        # # plot()
+        # print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
 
