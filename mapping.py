@@ -284,7 +284,7 @@ def detect():
     return
 
 
-def set_target(rel_y=40, rel_x=0):  # relative position(cm) to car
+def set_target(rel_y=40, rel_x=40):  # relative position(cm) to car
     global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
