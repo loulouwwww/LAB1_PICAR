@@ -1,3 +1,4 @@
+import heapq
 import math
 import sys
 import threading
@@ -258,12 +259,10 @@ def detect():
         if counter % fps_avg_frame_count == 0:
             end_time = time.time()
             fps = fps_avg_frame_count / (end_time - start_time)
-            
-        #print fps when detecting
+
+        # print fps when detecting
             print('Fps now is: ', fps)
             start_time = time.time()
-
-        
 
         # Show the FPS
         fps_text = 'FPS = {:.1f}'.format(fps)
@@ -281,7 +280,7 @@ def detect():
     return
 
 
-def set_target(rel_y=50, rel_x=50):  # relative position(cm) to car
+def set_target(rel_y=30, rel_x=30):  # relative position(cm) to car
     global curr_status, global_map, target_y, target_x
     curr_status = 0
     y = int(rel_y/unit)+curr_y
@@ -335,10 +334,10 @@ def neighbors(i, j):
     if j - 1 >= 0 and global_map[i][j-1] not in [1, 2]:
         res.append((i, j-1))
 
-    for coord in res:
-        ii, jj = coord
-        print(coord)
-        print(global_map[ii][jj])
+    # for coord in res:
+    #     ii, jj = coord
+    #     print(coord)
+    #     print(global_map[ii][jj])
     return res
 
 
@@ -387,7 +386,8 @@ def astar_single(dest, start, limit):
                 if jj == j - 1:
                     direction = 3  # move left
 
-                heapq.heappush(frontier, (new_fx, Node(node, neighbor, direction)))
+                heapq.heappush(
+                    frontier, (new_fx, Node(node, neighbor, direction)))
 
     return res
 
@@ -396,20 +396,21 @@ def self_driving():  # self driving until reach target
     set_target()
     while curr_status == 0:
         update_map()
+        plot()
         route((target_y, target_x), (curr_y, curr_x))
-        if cv2.waitKey(1) == 27:  # press esc
-            break
-    plot()
+        # if cv2.waitKey(1) == 27:  # press esc
+        #     break
+        plot()
     return
 
 
 def main():
-    cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
-    cv_thread.start()
+    # cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
+    # cv_thread.start()
 
     for i in range(2):
         self_driving()
-        print(cv_thread.name+' is alive ', cv_thread.isAlive())
+        # print(cv_thread.name+' is alive ', cv_thread.isAlive())
     return
 
 
