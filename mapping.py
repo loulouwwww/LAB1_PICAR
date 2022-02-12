@@ -254,6 +254,7 @@ def detect():
             elif d.categories[0].label == 0:  # person
                 s_p_detect = 2
         cv_detected = s_p_detect
+        print(s_p_detect)
         # Draw keypoints and edges on input image
         image = utils.visualize(image, detections)
 
@@ -294,20 +295,21 @@ def set_target(rel_y=40, rel_x=0):  # relative position(cm) to car
 
 
 def route(dest, start, steps=3):
-    path = astar_single(dest, start, steps)
-    for operation in path:
-        if operation == -1:
-            continue
-        movement = (operation-curr_dir) % 4
-        movement_list.append(movement)
-        if movement == 0:
-            move_forward()
-        elif movement == 1:
-            move_left()
-        elif movement == 2:
-            move_backward()
-        elif movement == 3:
-            move_right()
+    while cv_detected == 0:
+        path = astar_single(dest, start, steps)
+        for operation in path:
+            if operation == -1:
+                continue
+            movement = (operation-curr_dir) % 4
+            movement_list.append(movement)
+            if movement == 0:
+                move_forward()
+            elif movement == 1:
+                move_left()
+            elif movement == 2:
+                move_backward()
+            elif movement == 3:
+                move_right()
 
 
 class Node(object):
