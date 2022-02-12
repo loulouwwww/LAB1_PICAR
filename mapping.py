@@ -142,8 +142,8 @@ def global_to_local(global_y, global_x):
 
 def mark_obs():
     global global_map, real_global_obs
-    r2 = half_lg**2
-    # print(real_global_obs)
+    r2 = half_lg**2+5
+    print('old obs', real_global_obs)
     remove_list = []
     for obs in real_global_obs:
         ly, lx = global_to_local(obs[0], obs[1])
@@ -162,6 +162,7 @@ def mark_obs():
                     # no bound check
                     if i**2+j**2 <= r2 and global_map[obs[0]+i][obs[1]+j] == 2:
                         global_map[obs[0]+i][obs[1]+j] = 0
+    print('removed obs', remove_list)
     for obs in remove_list:
         real_global_obs.remove(obs)
     # print('add')
@@ -180,6 +181,7 @@ def mark_obs():
                 # no bound check
                 if i**2+j**2 <= r2 and global_map[base_y+i][base_x+j] == 0:
                     global_map[base_y+i][base_x+j] = 2
+    print('new obs', real_global_obs)
     return
 
 
@@ -352,7 +354,7 @@ def set_target(rel_y=160, rel_x=0):  # relative position(cm) to car
 
 
 def route(dest, start, steps=10):
-    path = astar_single(dest, start)
+    path = astar_single(dest, start, steps)
     for operation in path:
         if operation == -1:
             continue
@@ -397,7 +399,7 @@ def neighbors(i, j):
     return res
 
 
-def astar_single(dest, start, steps=10, limit=5000):
+def astar_single(dest, start, steps=10, limit=10000):
     node = Node(None, start, -1)
     frontier = [(manhattan_distance(start, dest), node)]
     closed = {}
@@ -436,7 +438,7 @@ def astar_single(dest, start, steps=10, limit=5000):
             if jj == j - 1:
                 direction = 3  # move left
             new_fx = manhattan_distance(
-                neighbor, dest) + from_start + 1 + 2*(direction != node.direction)
+                neighbor, dest) + from_start + 1 + 4*(direction != node.direction)
 
             if neighbor not in closed or new_fx < closed[neighbor]:
                 heapq.heappush(
