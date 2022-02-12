@@ -152,11 +152,11 @@ def mark_obs():
         if ly >= -1 and ly <= size and lx >= -half_size-1 and lx <= half_size+1:
             remove_list.append(obs)
             global_map[obs[0], obs[1]] = 0
-        # remove 2 ways
-        # for i in range(-half_lg, half_lg+1):
-        #     for j in range(-half_lg, half_lg + 1):
-        #         if global_map[obs[0]+i][obs[1]+j] == 2:
-        #             global_map[obs[0]+i][obs[1]+j] = 0
+            # remove 2 ways
+            # for i in range(-half_lg, half_lg+1):
+            #     for j in range(-half_lg, half_lg + 1):
+            #         if global_map[obs[0]+i][obs[1]+j] == 2:
+            #             global_map[obs[0]+i][obs[1]+j] = 0
             for i in range(-half_lg, half_lg+1):
                 for j in range(-half_lg, half_lg + 1):
                     # no bound check
@@ -353,8 +353,6 @@ def set_target(rel_y=80, rel_x=0):  # relative position(cm) to car
 
 def route(dest, start, steps=10):
     path = astar_single(dest, start)
-    mlen = min(len(path), steps)
-    path = path[:mlen]
     for operation in path:
         if operation == -1:
             continue
@@ -399,7 +397,7 @@ def neighbors(i, j):
     return res
 
 
-def astar_single(dest, start, limit=5000):
+def astar_single(dest, start, steps=10, limit=5000):
     node = Node(None, start, -1)
     frontier = [(manhattan_distance(start, dest), node)]
     closed = {}
@@ -411,7 +409,7 @@ def astar_single(dest, start, limit=5000):
         elem = heapq.heappop(frontier)
 
         fx = elem[0]
-        node = elem[1]
+        node = elem[1]  # NODE
 
         curr = node.loc
         closed[curr] = fx
@@ -420,7 +418,6 @@ def astar_single(dest, start, limit=5000):
 
         i = curr[0]
         j = curr[1]
-        print(fx, i, j)
         if step >= limit or (i, j) == dest:
             while node:
                 res.append(node.direction)
@@ -428,34 +425,37 @@ def astar_single(dest, start, limit=5000):
             break
 
         for neighbor in neighbors(i, j):
-            new_fx = manhattan_distance(neighbor, dest) + from_start + 1
+            ii, jj = neighbor
+
+            direction = 0  # move down by default
+
+            if jj == j + 1:
+                direction = 1  # move right
+            if ii == i - 1:
+                direction = 2  # move up
+            if jj == j - 1:
+                direction = 3  # move left
+            new_fx = manhattan_distance(
+                neighbor, dest) + from_start + 1 + 2*(direction != node.direction)
 
             if neighbor not in closed or new_fx < closed[neighbor]:
-                ii, jj = neighbor
-
-                direction = 0  # move down by default
-
-                if jj == j + 1:
-                    direction = 1  # move right
-                if ii == i - 1:
-                    direction = 2  # move up
-                if jj == j - 1:
-                    direction = 3  # move left
-
                 heapq.heappush(
                     frontier, (new_fx, Node(node, neighbor, direction)))
     res.reverse()
+    mlen = min(len(res), steps)
+    res = res[:mlen]
     return res
 
 
 def self_driving():  # self driving until reach target
     set_target()
-    while cv_detected == 0 and ((curr_x != target_x) or (curr_y != target_y)):
+    count = 0
+    while cv_detected == 0 and ((curr_x != target_x) or (curr_y != target_y) and count < 20):
         update_map()
         route((target_y, target_x), (curr_y, curr_x))
         # if cv2.waitKey(1) == 27:  # press esc
         #     break
-    print('1')
+    print(count)
     plot()
     return
 
@@ -470,10 +470,6 @@ def main():
         # # plot()
         # print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
-    return
-
-
-def test():
     return
 
 

@@ -245,8 +245,6 @@ def test():
 
 def route(dest, start, steps=10):
     path = astar_single(dest, start)
-    mlen = min(len(path), steps)
-    path = path[:mlen]
     for operation in path:
         if operation == -1:
             continue
@@ -291,7 +289,7 @@ def neighbors(i, j):
     return res
 
 
-def astar_single(dest, start, limit=50000):
+def astar_single(dest, start, steps=10, limit=5000):
     node = Node(None, start, -1)
     frontier = [(manhattan_distance(start, dest), node)]
     closed = {}
@@ -330,25 +328,14 @@ def astar_single(dest, start, limit=50000):
             if jj == j - 1:
                 direction = 3  # move left
             new_fx = manhattan_distance(
-                neighbor, dest) + from_start + 1 + 0*(direction != node.direction)
-            # new_fx = manhattan_distance(
-            #     neighbor, dest) + from_start + 1
+                neighbor, dest) + from_start + 1 + 2*(direction != node.direction)
 
             if neighbor not in closed or new_fx < closed[neighbor]:
-                # ii, jj = neighbor
-
-                # direction = 0  # move down by default
-
-                # if jj == j + 1:
-                #     direction = 1  # move right
-                # if ii == i - 1:
-                #     direction = 2  # move up
-                # if jj == j - 1:
-                #     direction = 3  # move left
-
                 heapq.heappush(
                     frontier, (new_fx, Node(node, neighbor, direction)))
     res.reverse()
+    mlen = min(len(res), steps)
+    res = res[:mlen]
     return res
 
 
