@@ -1,5 +1,6 @@
 import heapq
 import math
+from msilib.schema import SelfReg
 import sys
 import threading
 import time
@@ -362,6 +363,8 @@ def set_target(rel_y=70, rel_x=0):  # relative position(cm) to car
 def route(dest, start, steps=10):
     path = astar_single(dest, start, steps)
     for operation in path:
+        if cv_detected != 0:
+            return
         if operation == -1:
             continue
         movement = (operation-curr_dir) % 4
@@ -455,8 +458,8 @@ def astar_single(dest, start, steps=10, limit=10000):
     return res
 
 
-def self_driving():  # self driving until reach target
-    set_target()
+def self_driving(rel_y=70, rel_x=0):  # self driving until reach target
+    set_target(rel_y, rel_x)
     count = 0
     while ((curr_x != target_x) or (curr_y != target_y) and count < 20):
         if cv_detected == 0:
@@ -473,11 +476,12 @@ def main():
     cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
     cv_thread.start()
 
-    for i in range(2):
-        self_driving()
-        # update_map()
-        # # plot()
-        print(cv_thread.name+' is alive ', cv_thread.isAlive())
+    # for i in range(2):
+    self_driving(70, 0)
+    self_driving(40, 30)
+    # update_map()
+    # # plot()
+    print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
 
