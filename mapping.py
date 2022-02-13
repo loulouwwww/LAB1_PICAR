@@ -297,6 +297,7 @@ def detect():
         num_threads=num_threads,
         score_threshold=0.3,
         max_results=3,
+        label_deny_list=['clock'],
         enable_edgetpu=enable_edgetpu)
     detector = ObjectDetector(model_path=model, options=options)
 
