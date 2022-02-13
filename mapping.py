@@ -347,7 +347,7 @@ def detect():
     return
 
 
-def set_target(rel_y=150, rel_x=0):  # relative position(cm) to car
+def set_target(rel_y=70, rel_x=0):  # relative position(cm) to car
     global global_map, target_y, target_x
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x
@@ -459,22 +459,22 @@ def self_driving():  # self driving until reach target
     while cv_detected == 0 and ((curr_x != target_x) or (curr_y != target_y) and count < 20):
         update_map()
         route((target_y, target_x), (curr_y, curr_x))
-        # if cv2.waitKey(1) == 27:  # press esc
-        #     break
+        if cv2.waitKey(1) == 27:  # press esc
+             break
     print(count)
     plot()
     return
 
 
 def main():
-    # cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
-    # cv_thread.start()
+    cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
+    cv_thread.start()
 
-    for i in range(1):
+    for i in range(2):
         self_driving()
         # update_map()
         # # plot()
-        # print(cv_thread.name+' is alive ', cv_thread.isAlive())
+        print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
 
