@@ -24,17 +24,11 @@ def main():
             if i == 1:
                hf.turn_left_deg()
                time.sleep(1)
-               fc.forward(speed)
-               time.sleep(1)
-               hf.turn_right_deg()
-               time.sleep(1)
+               
             else:
                 hf.turn_right_deg()
                 time.sleep(1)
-                fc.forward(speed)
-                time.sleep(1)
-                hf.turn_left_deg()
-                time.sleep(1)
+                
         
         fc.forward(speed)
 
