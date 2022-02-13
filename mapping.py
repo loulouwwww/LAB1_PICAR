@@ -148,6 +148,7 @@ def mark_obs():
     global global_map, real_global_obs
     r2 = 9
     bound_f = half_lg-1
+    bound_a = half_lg+1
     print('old obs', real_global_obs)
     remove_list = []
     for obs in real_global_obs:
@@ -162,8 +163,8 @@ def mark_obs():
             #     for j in range(-bound_f, bound_f + 1):
             #         if global_map[obs[0]+i][obs[1]+j] == 2:
             #             global_map[obs[0]+i][obs[1]+j] = 0
-            for i in range(-bound_f, bound_f+1):
-                for j in range(-bound_f, bound_f + 1):
+            for i in range(-bound_a, bound_a+1):
+                for j in range(-bound_a, bound_a + 1):
                     # no bound check
                     o_x, o_y = bound(obs[1]+j, obs[0]+i)
                     if i**2+j**2 <= r2 and global_map[o_y][o_x] == 2:
