@@ -14,7 +14,7 @@ import picar_4wd as fc
 import utils
 from object_detector import ObjectDetector, ObjectDetectorOptions
 
-size = 20  # size of local map
+size = 16  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
