@@ -51,6 +51,7 @@ def polar_mapping(step=18):
     polar_map = []
     for angle in range(-90, 91, step):
         angdis = [angle, fc.get_distance_at(angle)]
+        print(angdis)
         polar_map.append(angdis)
     return
 
