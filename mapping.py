@@ -458,11 +458,12 @@ def astar_single(dest, start, steps=10, limit=10000):
 def self_driving():  # self driving until reach target
     set_target()
     count = 0
-    while cv_detected == 0 and ((curr_x != target_x) or (curr_y != target_y) and count < 20):
-        update_map()
-        route((target_y, target_x), (curr_y, curr_x))
-        if cv2.waitKey(1) == 27:  # press esc
-             break
+    while ((curr_x != target_x) or (curr_y != target_y) and count < 20):
+        if cv_detected == 0:
+            update_map()
+            route((target_y, target_x), (curr_y, curr_x))
+            if cv2.waitKey(1) == 27:  # press esc
+                break
     print(count)
     plot()
     return
