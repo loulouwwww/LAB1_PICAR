@@ -343,7 +343,7 @@ def detect():
     return
 
 
-def set_target(rel_y=160, rel_x=0):  # relative position(cm) to car
+def set_target(rel_y=200, rel_x=0):  # relative position(cm) to car
     global global_map, target_y, target_x
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x

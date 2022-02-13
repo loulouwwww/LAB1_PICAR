@@ -17,7 +17,7 @@ def turn_right_deg():
 
 def turn_left_deg():
     fc.turn_left(100)
-    for i in range(10):
+    for i in range(11):
         time.sleep(0.05)
     fc.stop()
     time.sleep(0.1)
