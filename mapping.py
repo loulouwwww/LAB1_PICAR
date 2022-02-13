@@ -142,7 +142,8 @@ def global_to_local(global_y, global_x):
 
 def mark_obs():
     global global_map, real_global_obs
-    r2 = half_lg**2+5
+    r2 = 9
+    bound = half_lg+1
     print('old obs', real_global_obs)
     remove_list = []
     for obs in real_global_obs:
@@ -153,12 +154,12 @@ def mark_obs():
             remove_list.append(obs)
             global_map[obs[0], obs[1]] = 0
             # remove 2 ways
-            # for i in range(-half_lg, half_lg+1):
-            #     for j in range(-half_lg, half_lg + 1):
+            # for i in range(-bound, bound+1):
+            #     for j in range(-bound, bound + 1):
             #         if global_map[obs[0]+i][obs[1]+j] == 2:
             #             global_map[obs[0]+i][obs[1]+j] = 0
-            for i in range(-half_lg, half_lg+1):
-                for j in range(-half_lg, half_lg + 1):
+            for i in range(-bound, bound+1):
+                for j in range(-bound, bound + 1):
                     # no bound check
                     if i**2+j**2 <= r2 and global_map[obs[0]+i][obs[1]+j] == 2:
                         global_map[obs[0]+i][obs[1]+j] = 0
@@ -172,12 +173,12 @@ def mark_obs():
         # print(base_y, base_x)
         real_global_obs.append([base_y, base_x])
         # padding 2 ways
-        # for i in range(-half_lg, half_lg+1):
-        #     for j in range(-half_lg, half_lg + 1):
+        # for i in range(-bound, bound+1):
+        #     for j in range(-bound, bound + 1):
         #         if global_map[base_y+i][base_x+j] == 0:
         #             global_map[base_y+i][base_x+j] = 2
-        for i in range(-half_lg, half_lg+1):
-            for j in range(-half_lg, half_lg + 1):
+        for i in range(-bound, bound+1):
+            for j in range(-bound, bound + 1):
                 # no bound check
                 if i**2+j**2 <= r2 and global_map[base_y+i][base_x+j] == 0:
                     global_map[base_y+i][base_x+j] = 2
