@@ -5,19 +5,23 @@ import time
 
 
 def turn_right_deg():
-
-    fc.turn_right(100)
-    for i in range(11):
-        time.sleep(0.05)
     fc.stop()
+    time.sleep(0.2)
+    fc.turn_right(100)
+    for i in range(21):
+        time.sleep(0.025)
+    fc.stop()
+    time.sleep(0.2)
 
 
 def turn_left_deg():
-    fc.turn_left(100)
-    for i in range(11):
-        time.sleep(0.05)
     fc.stop()
-
+    time.sleep(0.2)
+    fc.turn_left(100)
+    for i in range(21):
+        time.sleep(0.025)
+    fc.stop()
+    time.sleep(0.2)
 # 50mm*2grid
 
 # n means grid
@@ -26,19 +30,20 @@ def turn_left_deg():
 def forward_grid(n=1):
     fc.forward(100)
     for i in range(n):
-        time.sleep(0.122)
+        time.sleep(0.10)
     fc.stop()
+
 
 
 def backward_grid(n=1):
     fc.backward(100)
     for i in range(n):
-        time.sleep(0.122)
+        time.sleep(0.10)
     fc.stop()
 
 
 if __name__ == "__main__":
     # forward_grid(2)
-
     forward_grid(5)
+    turn_left_deg()
     fc.stop()

@@ -49,6 +49,8 @@ cv_detected = 0
 def polar_mapping(step=18):
     global polar_map
     polar_map = []
+    fc.get_distance_at(-90)
+    time.sleep(0.5)
     for angle in range(-90, 91, step):
         angdis = [angle, fc.get_distance_at(angle)]
         polar_map.append(angdis)
@@ -344,7 +346,7 @@ def detect():
     return
 
 
-def set_target(rel_y=200, rel_x=0):  # relative position(cm) to car
+def set_target(rel_y=150, rel_x=0):  # relative position(cm) to car
     global global_map, target_y, target_x
     y = int(rel_y/unit)+curr_y
     x = int(rel_x/unit)+curr_x
@@ -515,4 +517,5 @@ def main():
 
 
 if __name__ == "__main__":
+    
     main()
