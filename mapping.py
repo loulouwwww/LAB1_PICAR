@@ -198,7 +198,7 @@ def update_map():
     polar_to_cartesian()
     mark_obs()
     mark_car()
-    plot()
+    #plot()
     return
 
 
@@ -269,8 +269,8 @@ def plot():
 
 def detect():
     global cv_detected
-    width = 160
-    height = 80
+    width = 320
+    height = 160
     num_threads = 4
     model = 'efficientdet_lite0.tflite'
     camera_id = 0
@@ -479,7 +479,7 @@ def main():
 
     # for i in range(2):
     self_driving(70, 0)
-    self_driving(40, 30)
+    self_driving(90, 30)
     # update_map()
     # # plot()
     print(cv_thread.name+' is alive ', cv_thread.isAlive())
