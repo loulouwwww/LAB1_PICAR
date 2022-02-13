@@ -1,6 +1,6 @@
 import heapq
 import math
-from msilib.schema import SelfReg
+#from msilib.schema import SelfReg
 import sys
 import threading
 import time
@@ -269,9 +269,9 @@ def plot():
 
 def detect():
     global cv_detected
-    width = 480
-    height = 320
-    num_threads = 2
+    width = 160
+    height = 80
+    num_threads = 4
     model = 'efficientdet_lite0.tflite'
     camera_id = 0
     enable_edgetpu = False
