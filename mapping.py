@@ -147,7 +147,7 @@ def global_to_local(global_y, global_x):
 def mark_obs():
     global global_map, real_global_obs
     r2 = 9
-    bound_f = half_lg+1
+    bound_f = half_lg-1
     print('old obs', real_global_obs)
     remove_list = []
     for obs in real_global_obs:
@@ -198,7 +198,7 @@ def update_map():
     polar_to_cartesian()
     mark_obs()
     mark_car()
-    #plot()
+    # plot()
     return
 
 
