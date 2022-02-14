@@ -61,7 +61,10 @@ def bound(base_x, base_y):
 def mark_car():
     global cart_map, real_local_obs, global_map, fake_obs, curr_x, curr_y
     curr_x, curr_y = bound(curr_x, curr_y)
-    global_map[curr_y][curr_x] = 3
+    if global_map[curr_y][curr_x] == 5:
+        return
+    else:
+        global_map[curr_y][curr_x] = 3
     # for i in range(-half_wg, half_wg+1):
     #     for j in range(-half_lg, half_lg+1):
     #         if curr_dir % 2 == 0:
@@ -119,26 +122,28 @@ def global_to_local(global_y, global_x):
 
 def mark_obs():
     global global_map, real_global_obs
-    r2 = half_lg**2
-    # print(real_global_obs)
+    r2 = 9
+    # bound_f = half_lg-1
+    bound_a = half_lg+1
     remove_list = []
     for obs in real_global_obs:
         ly, lx = global_to_local(obs[0], obs[1])
         # print(ly, lx)
         # print(obs[0], obs[1])
-        if ly >= -1 and ly <= size and lx >= -half_size-1 and lx <= half_size+1:
+        if ly >= 1 and ly <= size and lx >= -half_size+1 and lx <= half_size:
             remove_list.append(obs)
             global_map[obs[0], obs[1]] = 0
-        # remove 2 ways
-        # for i in range(-half_lg, half_lg+1):
-        #     for j in range(-half_lg, half_lg + 1):
-        #         if global_map[obs[0]+i][obs[1]+j] == 2:
-        #             global_map[obs[0]+i][obs[1]+j] = 0
-            for i in range(-half_lg, half_lg+1):
-                for j in range(-half_lg, half_lg + 1):
+            # remove 2 ways
+            # for i in range(-bound_f, bound_f+1):
+            #     for j in range(-bound_f, bound_f + 1):
+            #         if global_map[obs[0]+i][obs[1]+j] == 2:
+            #             global_map[obs[0]+i][obs[1]+j] = 0
+            for i in range(-bound_a, bound_a+1):
+                for j in range(-bound_a, bound_a + 1):
                     # no bound check
-                    if i**2+j**2 <= r2 and global_map[obs[0]+i][obs[1]+j] == 2:
-                        global_map[obs[0]+i][obs[1]+j] = 0
+                    o_x, o_y = bound(obs[1]+j, obs[0]+i)
+                    if i**2+j**2 <= r2 and global_map[o_y][o_x] == 2:
+                        global_map[o_y][o_x] = 0
     for obs in remove_list:
         real_global_obs.remove(obs)
     # print('add')
@@ -148,15 +153,16 @@ def mark_obs():
         # print(base_y, base_x)
         real_global_obs.append([base_y, base_x])
         # padding 2 ways
-        # for i in range(-half_lg, half_lg+1):
-        #     for j in range(-half_lg, half_lg + 1):
+        # for i in range(-bound_f, bound_f+1):
+        #     for j in range(-bound_f, bound_f + 1):
         #         if global_map[base_y+i][base_x+j] == 0:
         #             global_map[base_y+i][base_x+j] = 2
-        for i in range(-half_lg, half_lg+1):
-            for j in range(-half_lg, half_lg + 1):
+        for i in range(-bound_a, bound_a+1):
+            for j in range(-bound_a, bound_a + 1):
                 # no bound check
-                if i**2+j**2 <= r2 and global_map[base_y+i][base_x+j] == 0:
-                    global_map[base_y+i][base_x+j] = 2
+                o_x, o_y = bound(base_x+j, base_y+i)
+                if i**2+j**2 <= r2 and global_map[o_y][o_x] == 0:
+                    global_map[o_y][o_x] = 2
     return
 
 
@@ -243,8 +249,8 @@ def test():
     return
 
 
-def route(dest, start, steps=10):
-    path = astar_single(dest, start)
+def route(dest, start, steps=5):
+    path = astar_single(dest, start, steps)
     for operation in path:
         if operation == -1:
             continue
@@ -289,7 +295,7 @@ def neighbors(i, j):
     return res
 
 
-def astar_single(dest, start, steps=10, limit=5000):
+def astar_single(dest, start, steps=10, limit=2000):
     node = Node(None, start, -1)
     frontier = [(manhattan_distance(start, dest), node)]
     closed = {}
@@ -311,6 +317,7 @@ def astar_single(dest, start, steps=10, limit=5000):
         i = curr[0]
         j = curr[1]
         if step >= limit or (i, j) == dest:
+            print('explore steps', step)
             while node:
                 res.append(node.direction)
                 node = node.prev
@@ -373,7 +380,6 @@ def main():
                  for i in range(-3*step_angle, 3*step_angle+1, step_angle)]
 
     set_target(110, 0)
-    print((target_y, target_x))
     update_map()
     plot()
     # route((target_y, target_x), (curr_y, curr_x))
@@ -386,11 +392,10 @@ def main():
     update_map()
     plot()
     count = 0
-    while (curr_y, curr_x) != (target_y, target_x) and count < 10:
+    while (curr_y, curr_x) != (target_y, target_x) and count < 20:
         route((target_y, target_x), (curr_y, curr_x))
         count += 1
-    print((curr_y, curr_x))
-    print(count)
+    print('time of calling route:', count)
     plot()
 
     return

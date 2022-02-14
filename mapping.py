@@ -1,15 +1,11 @@
 import heapq
 import math
-#from msilib.schema import SelfReg
 import sys
 import threading
 import time
-from unittest import case
-
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-
 import helper_functions as hf
 import picar_4wd as fc
 import utils
@@ -19,31 +15,27 @@ size = 20  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
+# car width: 3 grids,length: 5 grids
 half_lg = int(car_length/unit / 2)  # 2
 half_wg = int(car_width/unit/2)  # 1
 half_size = int(size/2)
+multiple = 3
+total_size = size*multiple+1
+
 real_local_obs = []  # [y,x]
 real_global_obs = []
-multiple = 3
-
 polar_map = []
 cart_map = np.zeros((size+1, size+1), dtype=int)  # local map
-total_size = size*multiple+1
 global_map = np.zeros((total_size, total_size),
-                      dtype=int)  # local map
+                      dtype=int)  # global map
 
-init_y = int(size*multiple/4)
-init_x = int(size*multiple/2)
 curr_y = int(size*multiple/4)
 curr_x = int(size*multiple/2)
-target_y = 5*init_y
-target_x = init_x
+target_y = 5*curr_y
+target_x = curr_x
 # Direction:0:screen down(0), 1:screen right(left90), 2:screen up(180), 3:screen left(right 90)
 curr_dir = 0
-# 0:routing 1:reach
-movement_list = []
 # map mark: 0:blank 1:real obs 2:fake obs 3:car center 4:car, 5:target
-# assume car w: 3 grids,l: 5 grids
 cv_detected = 0
 
 
@@ -102,9 +94,8 @@ def mark_car():
     #             global_map[y][x] = 4
     return
 
+
 # transform the local coord to global coord
-
-
 def local_to_global(local_y, local_x):
     global_y = 0
     global_x = 0
@@ -122,9 +113,9 @@ def local_to_global(local_y, local_x):
         global_x = curr_x-local_y-(half_lg+1)
     global_x, global_y = bound(global_x, global_y)
     return global_y, global_x
+
+
 # transform the global coord to local coord
-
-
 def global_to_local(global_y, global_x):
     local_y = 0
     local_x = 0
@@ -194,7 +185,6 @@ def mark_obs():
 
 
 def update_map():
-    # global cart_map, real_obs, global_map, fake_obs
     polar_mapping()
     polar_to_cartesian()
     mark_obs()
@@ -298,7 +288,7 @@ def detect():
         num_threads=num_threads,
         score_threshold=0.3,
         max_results=3,
-        label_deny_list=['clock','dog','tv','chair','laptop'],
+        label_deny_list=['clock', 'dog', 'tv', 'chair', 'laptop'],
         enable_edgetpu=enable_edgetpu)
     detector = ObjectDetector(model_path=model, options=options)
 
@@ -323,7 +313,7 @@ def detect():
             elif d.categories[0].label == "person":  # person
                 s_p_detect = 2
         cv_detected = s_p_detect
-        #print(s_p_detect)
+        # print(s_p_detect)
         # Draw keypoints and edges on input image
         image = utils.visualize(image, detections)
 
@@ -478,23 +468,11 @@ def main():
     cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
     cv_thread.start()
 
-    i=0
-    time.sleep(2)
-    while i <60:
-        if cv_detected==0:
-            hf.forward_grid(1)
-            i+=1
-        else:
-            fc.stop()
-    print('reach')
-    #self_driving(90, 30)
-    # update_map()
-    # # plot()
-    #print(cv_thread.name+' is alive ', cv_thread.isAlive())
+    self_driving(70, 0)
+    self_driving(90, 30)
+    print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
-
-
 
 
 if __name__ == "__main__":
