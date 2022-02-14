@@ -249,7 +249,7 @@ def test():
     return
 
 
-def route(dest, start, steps=5):
+def route(dest, start, steps=12):
     path = astar_single(dest, start, steps)
     for operation in path:
         if operation == -1:
@@ -335,9 +335,10 @@ def astar_single(dest, start, steps=10, limit=2000):
             if jj == j - 1:
                 direction = 3  # move left
             new_fx = manhattan_distance(
-                neighbor, dest) + from_start + 1 + 2*(direction != node.direction)
+                neighbor, dest) + from_start + 1 + 1*(direction != node.direction)
 
             if neighbor not in closed or new_fx < closed[neighbor]:
+                closed[neighbor] = new_fx
                 heapq.heappush(
                     frontier, (new_fx, Node(node, neighbor, direction)))
     res.reverse()

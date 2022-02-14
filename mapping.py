@@ -184,6 +184,12 @@ def mark_obs():
     return
 
 
+def plot():
+    plt.figure()
+    plt.imshow(global_map)
+    plt.show()
+
+
 def update_map():
     polar_mapping()
     polar_to_cartesian()
@@ -252,10 +258,14 @@ def move_right():
     return
 
 
-def plot():
-    plt.figure()
-    plt.imshow(global_map)
-    plt.show()
+def set_target(rel_y=70, rel_x=0):  # relative position(cm) to car
+    global global_map, target_y, target_x
+    y = int(rel_y/unit)+curr_y
+    x = int(rel_x/unit)+curr_x
+    target_x, target_y = bound(x, y)
+    global_map[target_y][target_x] = 5
+    print('target', target_y, target_x)
+    return
 
 
 def detect():
@@ -339,16 +349,6 @@ def detect():
 
     cap.release()
     cv2.destroyAllWindows()
-    return
-
-
-def set_target(rel_y=70, rel_x=0):  # relative position(cm) to car
-    global global_map, target_y, target_x
-    y = int(rel_y/unit)+curr_y
-    x = int(rel_x/unit)+curr_x
-    target_x, target_y = bound(x, y)
-    global_map[target_y][target_x] = 5
-    print('target', target_y, target_x)
     return
 
 
@@ -439,7 +439,7 @@ def astar_single(dest, start, steps=10, limit=10000):
             if jj == j - 1:
                 direction = 3  # move left
             new_fx = manhattan_distance(
-                neighbor, dest) + from_start + 1 + 4*(direction != node.direction)
+                neighbor, dest) + from_start + 1 + 2*(direction != node.direction)
 
             if neighbor not in closed or new_fx < closed[neighbor]:
                 heapq.heappush(
