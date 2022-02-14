@@ -15,7 +15,7 @@ import picar_4wd as fc
 import utils
 from object_detector import ObjectDetector, ObjectDetectorOptions
 
-size = 16  # size of local map
+size = 20  # size of local map
 unit = 5  # cm/grid
 car_width = 16  # cm
 car_length = 23.5
@@ -47,7 +47,7 @@ movement_list = []
 cv_detected = 0
 
 
-def polar_mapping(step=18):
+def polar_mapping(step=10):
     global polar_map
     polar_map = []
     fc.get_distance_at(-90)
@@ -270,8 +270,8 @@ def plot():
 
 def detect():
     global cv_detected
-    width = 320
-    height = 160
+    width = 240
+    height = 180
     num_threads = 4
     model = 'efficientdet_lite0.tflite'
     camera_id = 0
@@ -298,7 +298,7 @@ def detect():
         num_threads=num_threads,
         score_threshold=0.3,
         max_results=3,
-        label_deny_list=['clock'],
+        label_deny_list=['clock','dog','tv','chair','laptop'],
         enable_edgetpu=enable_edgetpu)
     detector = ObjectDetector(model_path=model, options=options)
 
@@ -323,7 +323,7 @@ def detect():
             elif d.categories[0].label == "person":  # person
                 s_p_detect = 2
         cv_detected = s_p_detect
-        print(s_p_detect)
+        #print(s_p_detect)
         # Draw keypoints and edges on input image
         image = utils.visualize(image, detections)
 
@@ -478,52 +478,23 @@ def main():
     cv_thread = threading.Thread(target=detect, name='cvThread', daemon=True)
     cv_thread.start()
 
-    # for i in range(2):
-    self_driving(70, 0)
-    self_driving(90, 30)
+    i=0
+    time.sleep(2)
+    while i <60:
+        if cv_detected==0:
+            hf.forward_grid(1)
+            i+=1
+        else:
+            fc.stop()
+    print('reach')
+    #self_driving(90, 30)
     # update_map()
     # # plot()
-    print(cv_thread.name+' is alive ', cv_thread.isAlive())
+    #print(cv_thread.name+' is alive ', cv_thread.isAlive())
     fc.stop()
     return
 
 
-# def main():
-#     step_angle = 18
-#     global cart_map, global_map, curr_dir
-#     np.set_printoptions(threshold=10000, linewidth=1000)
-
-#     polar_map = [[i, 65-0.1*i]
-#                  for i in range(-3*step_angle, 3*step_angle+1, step_angle)]
-#     update_map(polar_map)
-#     move_left()
-#     for i in range(20):
-#         move_forward()
-#     polar_map = [[i, 50-0.1*i]
-#                  for i in range(-1*step_angle, 5*step_angle+1, step_angle)]
-#     update_map(polar_map)
-#     move_right()
-#     for i in range(20):
-#         move_forward()
-#     polar_map = [[i, 35-0.1*i]
-#                  for i in range(-2*step_angle, 5*step_angle+1, step_angle)]
-#     update_map(polar_map)
-#     move_right()
-#     for i in range(20):
-#         move_forward()
-#     polar_map = [[i, 30-0.1*i]
-#                  for i in range(-5*step_angle, 5*step_angle+1, step_angle)]
-#     update_map(polar_map)
-#     for i in range(10):
-#         move_backward()
-#     polar_map = [[i, 30]
-#                  for i in range(-5*step_angle, 5*step_angle+1, step_angle)]
-#     move_left()
-#     for i in range(20):
-#         move_forward()
-#     update_map(polar_map)
-#     plot()
-#     return
 
 
 if __name__ == "__main__":
