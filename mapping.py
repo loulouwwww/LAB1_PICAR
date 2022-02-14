@@ -268,6 +268,10 @@ def set_target(rel_y=70, rel_x=0):  # relative position(cm) to car
     return
 
 
+# this dectect() function is modified from the given example code
+# of object detection of  OpenCV on the Raspberry Pi
+# we also import the object_detector.py and efficientdet_lite0.tflite
+# to implement object detection
 def detect():
     global cv_detected
     width = 240
